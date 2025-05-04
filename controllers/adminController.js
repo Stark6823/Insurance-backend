@@ -1,23 +1,27 @@
 const User = require('../models/User');
 
-// Promote a user to AGENT/ADMIN (Admin-only action)
-exports.promoteToAgent = async (req, res) => {
+exports.getAllAgents =  async (req, res) => {
   try {
-    const { userId } = req.params;
-    const { role } = req.body; // Role to assign (AGENT/ADMIN)
-
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { role },
-      { new: true } // Return updated user
-    );
-
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    res.json({ message: 'User role updated', user });
+    const agents = await User.find({ role: 'AGENT' })
+      .sort({ createdAt: -1 })
+      .select('_id firstName lastName email createdAt');
+    res.json(agents);
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    console.error('Error fetching agents:', err);
+    res.status(500).json({ message: 'Server error' });
   }
-};
+}
+
+
+exports.deleteAgent = async (req, res) => {
+  try {
+    const agent = await User.findByIdAndDelete(req.params.id);
+    if (!agent) {
+      return res.status(404).json({ message: 'Agent not found' });
+    }
+    res.json({ message: 'Agent deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting agent:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+}

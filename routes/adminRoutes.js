@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { checkRole } = require('../middleware/roleMiddleware');
-const { promoteToAgent } = require('../controllers/adminController');
+const { deleteAgent, getAllAgents } = require('../controllers/adminController');
 
-// Only admins can promote users to agents/admins
-router.patch('/promote/:userId', checkRole(['ADMIN']), promoteToAgent);
+router.get('/agents',getAllAgents);
+  
+  
+router.delete('/agents/:id',deleteAgent);
+
 
 module.exports = router;
